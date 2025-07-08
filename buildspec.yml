@@ -6,15 +6,15 @@ phases:
       nodejs: 18
     commands:
       - echo "🔧 Installing frontend dependencies..."
-      - cd ahilyanagarfeedback/client
+      - cd client
       - npm install
       - npm run build
-      - cd ../../
+      - cd ..
 
       - echo "🔧 Installing backend dependencies..."
-      - cd ahilyanagarfeedback/server
+      - cd server
       - npm install
-      - cd ../../
+      - cd ..
 
   build:
     commands:
@@ -23,4 +23,4 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: ahilyanagarfeedback/client/build
+  base-directory: client/build
