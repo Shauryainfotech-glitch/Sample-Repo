@@ -1,0 +1,36 @@
+version: 0.2
+
+phases:
+install:
+    runtime-versions:
+     nodejs: 18 # Change Node.js version if needed
+    commands:
+     - echo "Installing dependencies..."
+     - cd client
+     - npm install --f # Change if you need specific flags or actions
+     - npm run build # Change if your build command is different
+     - cd .. # Return to root directory
+
+     - cd server
+     - npm install --f # Change if you need specific flags or actions
+     - cd .. # Return to root directory
+
+build:
+    commands:
+     - echo "Build phase completed successfully!" # Change or remove as needed
+
+post_build:
+    commands:
+     - echo "------------------- Deploying Client -------------------"
+     - aws s3 sync client/build/ s3://<your-bucket-name>/client/ --delete # Change S3 bucket path
+     - echo "Client deployed to S3!"
+
+     - echo "------------------- Deploying Server -------------------"
+     - aws deploy push --application-name <your-application-name> --s3-location s3://<your-bucket-name>/server/<your-application-name>.zip --description "Deploy Server Code" --region <your-region> # Change the application name, region, and S3 location
+     - echo "Server deployed!"
+
+artifacts:
+files:
+    - 'client/build/**/*' # Change if you want to include different files
+    - 'server/build/**/*' # Change if you want to include different files
+base-directory: '.' # Change if you want to collect artifacts from a different directory
