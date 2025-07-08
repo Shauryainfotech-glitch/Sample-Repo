@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "🔧 Installing frontend dependencies..."
+      - cd client
+      - npm install
+      - npm run build
+      - cd ..
+
+      - echo "🔧 Installing backend dependencies..."
+      - cd server
+      - npm install
+      - cd ..
+
+  build:
+    commands:
+      - echo "✅ Build phase completed."
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: client/build
