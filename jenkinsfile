@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'Node18'  // Must match the tool name configured in Jenkins
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo "🔄 Cloning repository"
+                git url: 'https://github.com/Shauryainfotech-glitch/Sample-Repo.git', branch: 'main'
+            }
+        }
+
+        stage('Setup Node.js') {
+            steps {
+                echo "🔧 Checking Node and npm versions"
+                sh 'node -v'
+                sh 'npm -v'
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo "📦 Installing frontend dependencies and building"
+                dir('client') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Prepare Backend') {
+            steps {
+                echo "📦 Installing backend dependencies"
+                dir('server') {
+                    sh 'npm install'
+                    // Optional: Run backend tests here
+                    // sh 'npm test'
+                }
+            }
+        }
+
+        stage('Archive Frontend Build Artifacts') {
+            steps {
+                echo "🗃️ Archiving frontend build artifacts"
+                archiveArtifacts artifacts: "client/build/**/*", fingerprint: true
+            }
+        }
+
+        stage('Deploy Backend') {
+            steps {
+                echo "🚀 Deploying backend"
+                dir('server') {
+                    // Replace this with your backend deploy commands
+                    echo "Deploy backend here (e.g. scp files, restart service)"
+                }
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo "🚀 Deploying frontend"
+                dir('client') {
+                    // Replace this with your frontend deploy commands
+                    echo "Deploy frontend here (e.g. upload build to server/CDN)"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully"
+        }
+        failure {
+            echo "❌ Pipeline failed! Check logs for details"
+        }
+        always {
+            echo "🧹 Cleaning up"
+        }
+    }
+}
