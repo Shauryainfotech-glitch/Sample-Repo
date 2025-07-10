@@ -1,0 +1,58 @@
+pipeline {
+  agent any
+
+  tools {
+    nodejs 'Node18'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git url: 'https://github.com/Shauryainfotech-glitch/Sample-Repo.git', branch: 'master'
+      }
+    }
+
+    stage('Install Dependencies') {
+      steps {
+        dir('server') {
+          sh 'npm install'
+        }
+      }
+    }
+
+    stage('Prepare Environment') {
+      steps {
+        dir('server') {
+          sh 'node setup-env.js'
+        }
+      }
+    }
+
+    stage('Deploy (Start Server)') {
+      steps {
+        dir('server') {
+          sh '''
+            if ! command -v pm2 > /dev/null; then
+              npm install -g pm2
+            fi
+            pm2 start server.js --name server || pm2 reload server
+          '''
+        }
+      }
+    }
+
+    stage('PM2 Logs') {
+      steps {
+        dir('server') {
+          sh 'pm2 logs server --lines 100 --nostream'
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo 'Backend pipeline execution finished'
+    }
+  }
+}
